@@ -1,9 +1,10 @@
 language: scala
-script:
-  - ./activator compile
-  - ./activator test
-  - ./activator scalastyle
+
+scala:
+  - 2.11.4
+
 jdk:
   - oraclejdk8
-before_install:
- - chmod +x activator
+
+script:
+  - sbt ++$TRAVIS_SCALA_VERSION test scalastyle
