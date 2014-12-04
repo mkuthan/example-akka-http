@@ -1,7 +1,9 @@
 language: scala
 script:
-  - activator compile
-  - activator test
-  - activator scalastyle
+  - ./activator compile
+  - ./activator test
+  - ./activator scalastyle
 jdk:
   - oraclejdk8
+before_install:
+ - chmod +x activator
