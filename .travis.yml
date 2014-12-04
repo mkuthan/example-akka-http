@@ -1,0 +1,7 @@
+language: scala
+script:
+  - activator compile
+  - activator test
+  - activator scalastyle
+jdk:
+  - oraclejdk8
