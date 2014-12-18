@@ -7,4 +7,7 @@ jdk:
   - oraclejdk8
 
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION test scalastyle
+  - sbt ++$TRAVIS_SCALA_VERSION clean coverage test scalastyle
+
+after_success:
+  - sbt coveralls

@@ -28,7 +28,7 @@ class ExampleServiceSpec extends Specification with Specs2RouteTest with Example
 
     "return a greeting for GET requests to the root path" in {
       Get() ~> exampleRoute ~> check {
-        responseAs[String] must contain("Say hello")
+        responseAs[String] must contain("Hello")
       }
     }
 

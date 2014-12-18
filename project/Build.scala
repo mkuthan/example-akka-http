@@ -14,11 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import org.scalastyle.sbt.ScalastylePlugin
 import sbt.Keys._
 import sbt._
 
 object BuildSettings {
+
+  import org.scalastyle.sbt.ScalastylePlugin.{Settings => scalastyleSettings}
+  import scoverage.ScoverageSbtPlugin.{buildSettings => scoverageSettings}
 
   val akkaV = "2.3.7"
   val sprayV = "1.3.2"
@@ -48,7 +50,8 @@ object BuildSettings {
         "com.typesafe.akka" %% "akka-testkit" % akkaV % "test",
         "org.specs2" %% "specs2" % specsV % "test"
       )
-    ) ++ ScalastylePlugin.Settings
+    ) ++ scalastyleSettings ++ scoverageSettings
+
 }
 
 object ApplicationBuild extends Build {

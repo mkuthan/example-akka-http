@@ -32,17 +32,9 @@ trait ExampleService extends HttpService {
   val exampleRoute =
     path("") {
       get {
-        respondWithMediaType(`text/html`) {
+        respondWithMediaType(`text/plain`) {
           complete {
-            <html>
-              <body>
-                <h1>Say hello to
-                  <i>spray-routing</i>
-                  on
-                  <i>spray-can</i>
-                  !</h1>
-              </body>
-            </html>
+              "Hello"
           }
         }
       }
