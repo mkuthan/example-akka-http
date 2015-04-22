@@ -16,33 +16,31 @@
 
 package example
 
-import org.specs2.mutable.Specification
-import spray.testkit.Specs2RouteTest
+import org.scalatest.{FlatSpec, Matchers}
 import spray.http.StatusCodes._
+import spray.testkit.ScalatestRouteTest
 
-class ExampleServiceSpec extends Specification with Specs2RouteTest with ExampleService {
+class ExampleServiceSpec extends FlatSpec with Matchers with ScalatestRouteTest with ExampleService {
 
   def actorRefFactory = system
 
-  "Example Service" should {
-
-    "return a greeting for GET requests to the root path" in {
-      Get() ~> exampleRoute ~> check {
-        responseAs[String] must contain("Hello")
-      }
-    }
-
-    "leave GET requests to other paths unhandled" in {
-      Get("/kermit") ~> exampleRoute ~> check {
-        handled must beFalse
-      }
-    }
-
-    "return a MethodNotAllowed error for PUT requests to the root path" in {
-      Put() ~> sealRoute(exampleRoute) ~> check {
-        status === MethodNotAllowed
-        responseAs[String] === "HTTP method not allowed, supported methods: GET"
-      }
+  "Example service" should "return a greeting for GET requests to the root path" in {
+    Get() ~> exampleRoute ~> check {
+      responseAs[String] should startWith("Hello")
     }
   }
+
+  it should "leave GET requests to other paths unhandled" in {
+    Get("/kermit") ~> exampleRoute ~> check {
+      handled shouldBe false
+    }
+  }
+
+  it should "return a MethodNotAllowed error for PUT requests to the root path" in {
+    Put() ~> sealRoute(exampleRoute) ~> check {
+      status should be(MethodNotAllowed)
+      responseAs[String] should be("HTTP method not allowed, supported methods: GET")
+    }
+  }
+
 }
