@@ -66,7 +66,8 @@ object ApplicationBuild extends Build {
     "org.slf4j" % "slf4j-api" % "1.7.10",
     "ch.qos.logback" % "logback-classic" % "1.1.2",
 
-    "org.scalatest" %% "scalatest" % "2.2.4" % "test"
+    "org.scalatest" %% "scalatest" % "2.2.4" % "test",
+    "org.scalamock" %% "scalamock-scalatest-support" % "3.2" % "test"
   )
 
   val customExcludeDependencies = Seq(

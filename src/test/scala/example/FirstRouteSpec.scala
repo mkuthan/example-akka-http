@@ -16,30 +16,21 @@
 
 package example
 
+import org.scalamock.scalatest.MockFactory
 import org.scalatest.{FlatSpec, Matchers}
-import spray.http.StatusCodes._
 import spray.testkit.ScalatestRouteTest
 
-class ExampleServiceSpec extends FlatSpec with Matchers with ScalatestRouteTest with ExampleService {
+class FirstRouteSpec extends FlatSpec with Matchers with MockFactory with ScalatestRouteTest with FirstRoute {
 
   def actorRefFactory = system
 
-  "Example service" should "return a greeting for GET requests to the root path" in {
-    Get() ~> exampleRoute ~> check {
-      responseAs[String] should startWith("Hello")
-    }
-  }
+  "Example service" should "return a greeting for GET requests" in {
+    val helloService = mock[HelloService]
 
-  it should "leave GET requests to other paths unhandled" in {
-    Get("/kermit") ~> exampleRoute ~> check {
-      handled shouldBe false
-    }
-  }
+    (helloService.hello _).expects(123).returning("Hello")
 
-  it should "return a MethodNotAllowed error for PUT requests to the root path" in {
-    Put() ~> sealRoute(exampleRoute) ~> check {
-      status should be(MethodNotAllowed)
-      responseAs[String] should be("HTTP method not allowed, supported methods: GET")
+    Get("/first/123") ~> firstRoute(helloService) ~> check {
+      responseAs[String] should be("Hello")
     }
   }
 

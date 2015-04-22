@@ -17,26 +17,14 @@
 package example
 
 import akka.actor.Actor
-import spray.http.MediaTypes._
-import spray.routing.HttpService
+import spray.routing.HttpServiceActor
 
-class ExampleServiceActor extends Actor with ExampleService {
+class RestService(helloService: HelloService)
+  extends HttpServiceActor
+  with FirstRoute
+  with SecondRoute {
 
-  def actorRefFactory = context
+  def receive: Actor.Receive = runRoute(firstRoute(helloService) ~
+    secondRoute(helloService))
 
-  def receive = runRoute(exampleRoute)
-}
-
-trait ExampleService extends HttpService {
-
-  val exampleRoute =
-    path("") {
-      get {
-        respondWithMediaType(`text/plain`) {
-          complete {
-              "Hello"
-          }
-        }
-      }
-    }
 }

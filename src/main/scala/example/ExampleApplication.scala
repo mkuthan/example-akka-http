@@ -18,17 +18,22 @@ package example
 
 import akka.actor.{ActorSystem, Props}
 import akka.io.IO
-import spray.can.Http
 import akka.pattern.ask
 import akka.util.Timeout
+import spray.can.Http
+
 import scala.concurrent.duration._
 
-object Boot extends App {
+object ExampleApplication extends App {
 
-  implicit val system = ActorSystem("on-spray-can")
+  val DEFAULT_PORT = 8080
+  val DEFAULT_INTERFACE = "0.0.0.0"
 
-  val service = system.actorOf(Props[ExampleServiceActor], "example-service")
+  implicit val system = ActorSystem("example-spray-system")
+
+  val helloService = new PleasantHelloService("Hello")
+  val service = system.actorOf(Props(new RestService(helloService)))
 
   implicit val timeout = Timeout(5.seconds)
-  IO(Http) ? Http.Bind(service, interface = "localhost", port = 8080)
+  IO(Http) ? Http.Bind(service, interface = DEFAULT_INTERFACE, port = DEFAULT_PORT)
 }
