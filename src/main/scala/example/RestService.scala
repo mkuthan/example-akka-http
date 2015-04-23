@@ -23,10 +23,8 @@ import scala.concurrent.ExecutionContext
 
 class RestService(helloService: ActorRef)(implicit ctx: ExecutionContext)
   extends HttpServiceActor
-  with FirstRoute
-  with SecondRoute {
+  with HelloRoute {
 
-  def receive: Actor.Receive = runRoute(firstRoute(helloService) ~
-    secondRoute(helloService))
+  def receive: Actor.Receive = runRoute(hello(helloService))
 
 }

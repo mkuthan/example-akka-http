@@ -24,12 +24,12 @@ import spray.can.Http
 object ExampleApplication extends App {
 
   import Timeouts._
-  import system.dispatcher
 
   val DEFAULT_PORT = 8080
   val DEFAULT_INTERFACE = "0.0.0.0"
 
   implicit val system = ActorSystem("example-spray-system")
+  implicit val executionContext = system.dispatcher
 
   val helloService = system.actorOf(Props(new HelloService("Hello")))
 

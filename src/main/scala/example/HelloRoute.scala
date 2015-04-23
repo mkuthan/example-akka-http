@@ -22,13 +22,12 @@ import spray.routing.{HttpService, Route}
 
 import scala.concurrent.ExecutionContext
 
-
-trait SecondRoute extends HttpService {
+trait HelloRoute extends HttpService {
 
   import Timeouts._
 
-  def secondRoute(helloService: ActorRef)(implicit ctx: ExecutionContext): Route =
-    path("second" / IntNumber) { number =>
+  def hello(helloService: ActorRef)(implicit ctx: ExecutionContext): Route =
+    path("hello" / IntNumber) { number =>
       get {
         complete {
           (helloService ? SayHello(number)).map { case hello: String => hello }

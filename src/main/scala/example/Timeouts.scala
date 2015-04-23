@@ -23,6 +23,6 @@ object Timeouts {
 
   import scala.concurrent.duration._
 
-  implicit val internalTimeout = Timeout(5.seconds)
+  implicit val internalTimeout = Timeout(500.millis)
 
 }
