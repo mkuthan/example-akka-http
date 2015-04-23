@@ -16,23 +16,13 @@
 
 package example
 
-import akka.actor.ActorRef
-import akka.pattern.ask
-import spray.routing.{HttpService, Route}
 
-import scala.concurrent.ExecutionContext
+object Timeouts {
 
+  import akka.util.Timeout
 
-trait SecondRoute extends HttpService {
+  import scala.concurrent.duration._
 
-  import Timeouts._
+  implicit val internalTimeout = Timeout(5.seconds)
 
-  def secondRoute(helloService: ActorRef)(implicit ctx: ExecutionContext): Route =
-    path("second" / IntNumber) { number =>
-      get {
-        complete {
-          (helloService ? SayHello(number)).map { case hello: String => hello }
-        }
-      }
-    }
 }

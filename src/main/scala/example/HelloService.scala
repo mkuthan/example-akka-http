@@ -16,14 +16,14 @@
 
 package example
 
-trait HelloService {
-  def hello(n: Int): String
-}
+import akka.actor.Actor
 
-class PleasantHelloService(msg: String) extends HelloService {
+class HelloService(msg: String) extends Actor {
 
-  override def hello(n: Int): String = {
-    s"$msg $n"
+  override def receive: Receive = {
+    case SayHello(n) => sender ! s"$msg $n"
   }
 
 }
+
+case class SayHello(n: Int)

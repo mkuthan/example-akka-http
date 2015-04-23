@@ -16,10 +16,12 @@
 
 package example
 
-import akka.actor.Actor
+import akka.actor.{Actor, ActorRef}
 import spray.routing.HttpServiceActor
 
-class RestService(helloService: HelloService)
+import scala.concurrent.ExecutionContext
+
+class RestService(helloService: ActorRef)(implicit ctx: ExecutionContext)
   extends HttpServiceActor
   with FirstRoute
   with SecondRoute {

@@ -16,18 +16,21 @@
 
 package example
 
-import org.scalamock.scalatest.MockFactory
+import akka.actor.Actor
+import akka.testkit.TestActorRef
 import org.scalatest.{FlatSpec, Matchers}
 import spray.testkit.ScalatestRouteTest
 
-class FirstRouteSpec extends FlatSpec with Matchers with MockFactory with ScalatestRouteTest with FirstRoute {
+class FirstRouteSpec extends FlatSpec with Matchers with ScalatestRouteTest with FirstRoute {
 
   def actorRefFactory = system
 
   "Example service" should "return a greeting for GET requests" in {
-    val helloService = mock[HelloService]
-
-    (helloService.hello _).expects(123).returning("Hello")
+    val helloService = TestActorRef(new Actor {
+      override def receive = {
+        case SayHello(123) => sender ! "Hello"
+      }
+    })
 
     Get("/first/123") ~> firstRoute(helloService) ~> check {
       responseAs[String] should be("Hello")

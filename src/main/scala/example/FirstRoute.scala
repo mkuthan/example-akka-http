@@ -16,15 +16,21 @@
 
 package example
 
+import akka.actor.ActorRef
+import akka.pattern.ask
 import spray.routing.{HttpService, Route}
+
+import scala.concurrent.ExecutionContext
 
 trait FirstRoute extends HttpService {
 
-  def firstRoute(helloService: HelloService): Route =
+  import Timeouts._
+
+  def firstRoute(helloService: ActorRef)(implicit ctx: ExecutionContext): Route =
     path("first" / IntNumber) { number =>
       get {
         complete {
-          helloService.hello(number)
+          (helloService ? SayHello(number)).map { case hello: String => hello }
         }
       }
     }
