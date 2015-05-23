@@ -17,10 +17,11 @@
 package example
 
 import akka.actor.Actor
+import akka.http.model.StatusCodes._
+import akka.http.testkit.ScalatestRouteTest
 import akka.testkit.TestActorRef
+import example.HelloService.{Hello, SayHello}
 import org.scalatest.{FlatSpec, Matchers}
-import spray.http.StatusCodes._
-import spray.testkit.ScalatestRouteTest
 
 class HelloRouteSpec extends FlatSpec with Matchers with ScalatestRouteTest with HelloRoute {
 
@@ -28,21 +29,20 @@ class HelloRouteSpec extends FlatSpec with Matchers with ScalatestRouteTest with
 
   val anyHelloService = TestActorRef(new Actor {
     override def receive = {
-      case SayHello(n) => sender ! "any hello message"
+      case SayHello(n) => sender ! Hello("any hello message")
     }
   })
 
   "HelloRoute" should "return a greeting for GET request" in {
     val helloService = TestActorRef(new Actor {
       override def receive = {
-        case SayHello(123) => sender ! "Hello"
+        case SayHello(123) => sender ! Hello("Hello")
       }
     })
 
     Get("/hello/123") ~> hello(helloService) ~> check {
-      status should be(OK)
-
-      responseAs[String] should be("Hello")
+      status shouldBe OK
+      responseAs[String] shouldBe "Hello"
     }
   }
 
@@ -53,14 +53,14 @@ class HelloRouteSpec extends FlatSpec with Matchers with ScalatestRouteTest with
       }
     })
 
-    Get("/hello/123") ~> sealRoute(hello(helloService)) ~> check {
-      status should be(InternalServerError)
+    Get("/hello/123") ~> hello(helloService) ~> check {
+      status shouldBe InternalServerError
     }
   }
 
   it should "ignore not a number for GET request" in {
     Get("/hello/not_a_number") ~> hello(anyHelloService) ~> check {
-      handled should be(false)
+      handled shouldBe false
     }
   }
 

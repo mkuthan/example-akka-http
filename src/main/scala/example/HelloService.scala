@@ -16,14 +16,24 @@
 
 package example
 
-import akka.actor.Actor
+import akka.actor.{Actor, Props}
 
-class HelloService(msg: String) extends Actor {
+object HelloService {
 
-  override def receive: Receive = {
-    case SayHello(n) => sender ! s"$msg $n"
-  }
+  case class SayHello(n: Int)
+
+  case class Hello(msg: String)
+
+  def props(msg: String): Props = Props(new HelloService(msg))
 
 }
 
-case class SayHello(n: Int)
+class HelloService(msg: String) extends Actor {
+
+  import HelloService._
+
+  override def receive: Receive = {
+    case SayHello(n) => sender() ! Hello(s"$msg $n")
+  }
+
+}

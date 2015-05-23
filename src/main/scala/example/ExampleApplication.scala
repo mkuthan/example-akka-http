@@ -16,24 +16,33 @@
 
 package example
 
-import akka.actor.{ActorSystem, Props}
-import akka.io.IO
-import akka.pattern.ask
-import spray.can.Http
+import akka.actor.{ActorRef, ActorSystem}
+import akka.http.Http
+import akka.http.server.Route
+import akka.stream.ActorFlowMaterializer
+import com.typesafe.config.ConfigFactory
+
+import scala.concurrent.ExecutionContext
 
 object ExampleApplication extends App {
 
-  import Timeouts._
+  implicit val system = ActorSystem("example-spray")
+  implicit val executor = system.dispatcher
+  implicit val materializer = ActorFlowMaterializer()
 
-  val DEFAULT_PORT = 8080
-  val DEFAULT_INTERFACE = "0.0.0.0"
+  val config = ConfigFactory.load()
 
-  implicit val system = ActorSystem("example-spray-system")
-  implicit val executionContext = system.dispatcher
+  val helloService = system.actorOf(HelloService.props("Hello"))
 
-  val helloService = system.actorOf(Props(new HelloService("Hello")))
+  val exampleApplication = new ExampleApplication(helloService)
 
-  val mainService = system.actorOf(Props(new RestService(helloService)))
-
-  IO(Http) ? Http.Bind(mainService, interface = DEFAULT_INTERFACE, port = DEFAULT_PORT)
+  Http().bindAndHandle(exampleApplication.routes, config.getString("http.interface"), config.getInt("http.port"))
 }
+
+class ExampleApplication(helloService: ActorRef)(implicit ctx: ExecutionContext)
+  extends HelloRoute {
+
+  def routes: Route = hello(helloService)
+
+}
+

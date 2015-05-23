@@ -22,8 +22,8 @@ object ApplicationBuild extends Build {
   import spray.revolver.RevolverPlugin.Revolver.{settings => revolverSettings}
 
   object Versions {
-    val akka = "2.3.7"
-    val spray = "1.3.2"
+    val akka = "2.3.10"
+    val akkaStream = "1.0-M5"
   }
 
   val projectName = "example-spray"
@@ -56,12 +56,11 @@ object ApplicationBuild extends Build {
   )
 
   val customLibraryDependencies = Seq(
-    "io.spray" %% "spray-can" % Versions.spray,
-    "io.spray" %% "spray-routing" % Versions.spray,
-    "io.spray" %% "spray-testkit" % Versions.spray % "test",
-
     "com.typesafe.akka" %% "akka-actor" % Versions.akka,
     "com.typesafe.akka" %% "akka-testkit" % Versions.akka % "test",
+
+    "com.typesafe.akka" %% "akka-http-experimental" % Versions.akkaStream,
+    "com.typesafe.akka" %% "akka-http-testkit-experimental" % Versions.akkaStream % "test",
 
     "org.slf4j" % "slf4j-api" % "1.7.10",
     "ch.qos.logback" % "logback-classic" % "1.1.2",
@@ -74,11 +73,11 @@ object ApplicationBuild extends Build {
     "org.slf4j" % "slf4j-log4j12"
   )
 
-  lazy val main = Project(projectName, base = file(".")).
-    settings(common).
-    settings(scalacOptions ++= customScalacOptions).
-    settings(resolvers ++= customResolvers).
-    settings(libraryDependencies ++= customLibraryDependencies).
-    settings(excludeDependencies ++= customExcludeDependencies).
-    settings(revolverSettings)
+  lazy val main = Project(projectName, base = file("."))
+    .settings(common)
+    .settings(scalacOptions ++= customScalacOptions)
+    .settings(resolvers ++= customResolvers)
+    .settings(libraryDependencies ++= customLibraryDependencies)
+    .settings(excludeDependencies ++= customExcludeDependencies)
+    .settings(revolverSettings)
 }

@@ -17,12 +17,15 @@
 package example
 
 import akka.actor.ActorRef
+import akka.http.marshalling.ToResponseMarshallable
+import akka.http.server.Directives._
+import akka.http.server.Route
 import akka.pattern.ask
-import spray.routing.{HttpService, Route}
+import example.HelloService.{Hello, SayHello}
 
 import scala.concurrent.ExecutionContext
 
-trait HelloRoute extends HttpService {
+trait HelloRoute {
 
   import Timeouts._
 
@@ -30,7 +33,9 @@ trait HelloRoute extends HttpService {
     path("hello" / IntNumber) { number =>
       get {
         complete {
-          (helloService ? SayHello(number)).map { case hello: String => hello }
+          (helloService ? SayHello(number)).map[ToResponseMarshallable] {
+            case Hello(msg) => msg
+          }
         }
       }
     }
