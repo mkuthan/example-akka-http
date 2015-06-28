@@ -21,10 +21,11 @@ import akka.http.Http
 import akka.http.server.Route
 import akka.stream.ActorFlowMaterializer
 import com.typesafe.config.ConfigFactory
+import com.typesafe.scalalogging.LazyLogging
 
 import scala.concurrent.ExecutionContext
 
-object ExampleApplication extends App {
+object ExampleApplication extends App with LazyLogging {
 
   implicit val system = ActorSystem("example-spray")
   implicit val executor = system.dispatcher
@@ -36,6 +37,7 @@ object ExampleApplication extends App {
 
   val exampleApplication = new ExampleApplication(helloService)
 
+  logger.info("Binding ...")
   Http().bindAndHandle(exampleApplication.routes, config.getString("http.interface"), config.getInt("http.port"))
 }
 

@@ -57,6 +57,7 @@ object ApplicationBuild extends Build {
 
   val customLibraryDependencies = Seq(
     "com.typesafe.akka" %% "akka-actor" % Versions.akka,
+    "com.typesafe.akka" %% "akka-slf4j" % Versions.akka,
     "com.typesafe.akka" %% "akka-testkit" % Versions.akka % "test",
 
     "com.typesafe.akka" %% "akka-http-experimental" % Versions.akkaStream,
@@ -64,6 +65,7 @@ object ApplicationBuild extends Build {
 
     "org.slf4j" % "slf4j-api" % "1.7.10",
     "ch.qos.logback" % "logback-classic" % "1.1.2",
+    "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
 
     "org.scalatest" %% "scalatest" % "2.2.4" % "test",
     "org.scalamock" %% "scalamock-scalatest-support" % "3.2" % "test"

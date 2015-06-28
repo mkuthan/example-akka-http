@@ -16,7 +16,8 @@
 
 package example
 
-import akka.actor.{Actor, Props}
+import akka.actor.{ActorLogging, Actor, Props}
+import com.typesafe.scalalogging.LazyLogging
 
 object HelloService {
 
@@ -28,12 +29,15 @@ object HelloService {
 
 }
 
-class HelloService(msg: String) extends Actor {
+class HelloService(msg: String) extends Actor with LazyLogging {
 
   import HelloService._
 
   override def receive: Receive = {
-    case SayHello(n) => sender() ! Hello(s"$msg $n")
+    case SayHello(n) => {
+      logger.info(s"Handle message $n")
+      sender() ! Hello(s"$msg $n")
+    }
   }
 
 }
