@@ -22,8 +22,8 @@ object ApplicationBuild extends Build {
   import spray.revolver.RevolverPlugin.Revolver.{settings => revolverSettings}
 
   object Versions {
-    val akka = "2.3.10"
-    val akkaStream = "1.0-M5"
+    val akka = "2.4.0"
+    val akkaStream = "1.0"
   }
 
   val projectName = "example-spray"
@@ -31,7 +31,7 @@ object ApplicationBuild extends Build {
   val common = Seq(
     version := "1.0",
     organization := "http://mkuthan.github.io/",
-    scalaVersion := "2.11.5"
+    scalaVersion := "2.11.7"
   )
 
   val customScalacOptions = Seq(
@@ -48,13 +48,6 @@ object ApplicationBuild extends Build {
     "-Ywarn-unused-import"
   )
 
-  val customResolvers = Seq(
-    Classpaths.sbtPluginReleases,
-    Classpaths.typesafeReleases,
-    "Sonatype OSS Releases" at "http://oss.sonatype.org/content/repositories/releases/",
-    "Scalaz Bintray Repo" at "http://dl.bintray.com/scalaz/releases"
-  )
-
   val customLibraryDependencies = Seq(
     "com.typesafe.akka" %% "akka-actor" % Versions.akka,
     "com.typesafe.akka" %% "akka-slf4j" % Versions.akka,
@@ -63,7 +56,7 @@ object ApplicationBuild extends Build {
     "com.typesafe.akka" %% "akka-http-experimental" % Versions.akkaStream,
     "com.typesafe.akka" %% "akka-http-testkit-experimental" % Versions.akkaStream % "test",
 
-    "org.slf4j" % "slf4j-api" % "1.7.10",
+    "org.slf4j" % "slf4j-api" % "1.7.12",
     "ch.qos.logback" % "logback-classic" % "1.1.2",
     "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
 
@@ -78,7 +71,6 @@ object ApplicationBuild extends Build {
   lazy val main = Project(projectName, base = file("."))
     .settings(common)
     .settings(scalacOptions ++= customScalacOptions)
-    .settings(resolvers ++= customResolvers)
     .settings(libraryDependencies ++= customLibraryDependencies)
     .settings(excludeDependencies ++= customExcludeDependencies)
     .settings(revolverSettings)

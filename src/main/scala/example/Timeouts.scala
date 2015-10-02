@@ -16,7 +16,6 @@
 
 package example
 
-
 object Timeouts {
 
   import akka.util.Timeout

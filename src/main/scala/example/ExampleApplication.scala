@@ -17,9 +17,9 @@
 package example
 
 import akka.actor.{ActorRef, ActorSystem}
-import akka.http.Http
-import akka.http.server.Route
-import akka.stream.ActorFlowMaterializer
+import akka.http.scaladsl.Http
+import akka.http.scaladsl.server.Route
+import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
 
@@ -29,7 +29,7 @@ object ExampleApplication extends App with LazyLogging {
 
   implicit val system = ActorSystem("example-spray")
   implicit val executor = system.dispatcher
-  implicit val materializer = ActorFlowMaterializer()
+  implicit val materializer = ActorMaterializer()
 
   val config = ConfigFactory.load()
 

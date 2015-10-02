@@ -17,8 +17,8 @@
 package example
 
 import akka.actor.Actor
-import akka.http.model.StatusCodes._
-import akka.http.testkit.ScalatestRouteTest
+import akka.http.scaladsl.model.StatusCodes._
+import akka.http.scaladsl.testkit.ScalatestRouteTest
 import akka.testkit.TestActorRef
 import example.HelloService.{Hello, SayHello}
 import org.scalatest.{FlatSpec, Matchers}

@@ -17,9 +17,9 @@
 package example
 
 import akka.actor.ActorRef
-import akka.http.marshalling.ToResponseMarshallable
-import akka.http.server.Directives._
-import akka.http.server.Route
+import akka.http.scaladsl.marshalling.ToResponseMarshallable
+import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Route
 import akka.pattern.ask
 import example.HelloService.{Hello, SayHello}
 
