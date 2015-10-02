@@ -14,16 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import com.typesafe.sbt.SbtAspectj
+import com.typesafe.sbt.SbtAspectj.AspectjKeys
 import sbt.Keys._
 import sbt._
+import spray.revolver.RevolverPlugin.Revolver
 
 object ApplicationBuild extends Build {
-
-  import spray.revolver.RevolverPlugin.Revolver.{settings => revolverSettings}
 
   object Versions {
     val akka = "2.4.0"
     val akkaStream = "1.0"
+    val kamon = "0.5.1"
   }
 
   val projectName = "example-spray"
@@ -60,6 +62,12 @@ object ApplicationBuild extends Build {
     "ch.qos.logback" % "logback-classic" % "1.1.2",
     "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
 
+    "io.kamon" %% "kamon-core" % Versions.kamon,
+    "io.kamon" %% "kamon-system-metrics" % Versions.kamon,
+    "io.kamon" %% "kamon-akka" % Versions.kamon,
+    "io.kamon" %% "kamon-annotation" % Versions.kamon,
+    "io.kamon" %% "kamon-log-reporter" % Versions.kamon,
+
     "org.scalatest" %% "scalatest" % "2.2.4" % "test",
     "org.scalamock" %% "scalamock-scalatest-support" % "3.2" % "test"
   )
@@ -73,5 +81,8 @@ object ApplicationBuild extends Build {
     .settings(scalacOptions ++= customScalacOptions)
     .settings(libraryDependencies ++= customLibraryDependencies)
     .settings(excludeDependencies ++= customExcludeDependencies)
-    .settings(revolverSettings)
+    .settings(Revolver.settings)
+    .settings(SbtAspectj.aspectjSettings)
+    .settings(javaOptions in Revolver.reStart ++= Seq("-Xms512m", "-Xmx512m", "-Dkamon.auto-start=true"))
+    .settings(javaOptions in Revolver.reStart <++= AspectjKeys.weaverOptions in SbtAspectj.Aspectj)
 }

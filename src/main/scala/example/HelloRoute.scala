@@ -22,13 +22,16 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.pattern.ask
 import example.HelloService.{Hello, SayHello}
+import kamon.annotation.{EnableKamon, Trace}
 
 import scala.concurrent.ExecutionContext
 
+@EnableKamon
 trait HelloRoute {
 
   import Timeouts._
 
+  @Trace("hello")
   def hello(helloService: ActorRef)(implicit ctx: ExecutionContext): Route =
     path("hello" / IntNumber) { number =>
       get {
