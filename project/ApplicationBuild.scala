@@ -28,7 +28,7 @@ object ApplicationBuild extends Build {
     val kamon = "0.5.1"
   }
 
-  val projectName = "example-spray"
+  val projectName = "example-akka-http"
 
   val common = Seq(
     version := "1.0",
