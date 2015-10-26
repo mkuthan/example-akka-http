@@ -16,6 +16,8 @@
 
 import com.typesafe.sbt.SbtAspectj
 import com.typesafe.sbt.SbtAspectj.AspectjKeys
+import io.gatling.sbt.GatlingKeys.GatlingIt
+import io.gatling.sbt.GatlingPlugin
 import sbt.Keys._
 import sbt._
 import spray.revolver.RevolverPlugin.Revolver
@@ -26,6 +28,7 @@ object ApplicationBuild extends Build {
     val akka = "2.4.0"
     val akkaStream = "1.0"
     val kamon = "0.5.1"
+    val gatling = "2.1.7"
   }
 
   val projectName = "example-akka-http"
@@ -63,13 +66,16 @@ object ApplicationBuild extends Build {
     "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
 
     "io.kamon" %% "kamon-core" % Versions.kamon,
-    "io.kamon" %% "kamon-system-metrics" % Versions.kamon,
-    "io.kamon" %% "kamon-akka" % Versions.kamon,
     "io.kamon" %% "kamon-annotation" % Versions.kamon,
+    //"io.kamon" %% "kamon-system-metrics" % Versions.kamon,
+    "io.kamon" %% "kamon-akka" % Versions.kamon,
     "io.kamon" %% "kamon-log-reporter" % Versions.kamon,
 
     "org.scalatest" %% "scalatest" % "2.2.4" % "test",
-    "org.scalamock" %% "scalamock-scalatest-support" % "3.2" % "test"
+    "org.scalamock" %% "scalamock-scalatest-support" % "3.2" % "test",
+
+    "io.gatling" % "gatling-test-framework" % Versions.gatling % "it",
+    "io.gatling.highcharts" % "gatling-charts-highcharts" % Versions.gatling % "it"
   )
 
   val customExcludeDependencies = Seq(
@@ -81,8 +87,11 @@ object ApplicationBuild extends Build {
     .settings(scalacOptions ++= customScalacOptions)
     .settings(libraryDependencies ++= customLibraryDependencies)
     .settings(excludeDependencies ++= customExcludeDependencies)
-    .settings(Revolver.settings)
     .settings(SbtAspectj.aspectjSettings)
+    .settings(Revolver.settings)
     .settings(javaOptions in Revolver.reStart ++= Seq("-Xms512m", "-Xmx512m", "-Dkamon.auto-start=true"))
     .settings(javaOptions in Revolver.reStart <++= AspectjKeys.weaverOptions in SbtAspectj.Aspectj)
+    .enablePlugins(GatlingPlugin)
+    .settings(javaOptions in GatlingIt ++= Seq("-Xms1024m", "-Xmx1024m"))
+
 }

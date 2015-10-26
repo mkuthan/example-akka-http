@@ -16,28 +16,27 @@
 
 package example
 
-import akka.actor.{ActorLogging, Actor, Props}
-import com.typesafe.scalalogging.LazyLogging
+import io.gatling.core.Predef._
+import io.gatling.http.Predef._
 
-object HelloService {
+import scala.concurrent.duration._
 
-  case class SayHello(n: Int)
+class ExampleSimulation extends Simulation {
 
-  case class Hello(msg: String)
+  val httpConf = http.baseURL("http://localhost:8080")
+  val example = scenario("Example Simulation").exec(Browse.browse)
 
-  def props(msg: String): Props = Props(new HelloService(msg))
+  setUp(
+    example.inject(rampUsers(1000) over (10.seconds))
+  ).protocols(httpConf)
 
 }
 
-class HelloService(msg: String) extends Actor with LazyLogging {
+object Browse {
+  val reqName = "Say hello @{n}".replaceAllLiterally("@", "$")
+  val reqUri = "/hello/@{n}".replaceAllLiterally("@", "$")
 
-  import HelloService._
-
-  override def receive: Receive = {
-    case SayHello(n) => {
-      logger.trace(s"Handle message $n")
-      sender() ! Hello(s"$msg $n")
-    }
+  val browse = during(5.minutes, "n") {
+    exec(http(reqName).get(reqUri)).pause(3, 180)
   }
-
 }

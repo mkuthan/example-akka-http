@@ -27,13 +27,13 @@ import scala.concurrent.ExecutionContext
 
 object ExampleApplication extends App with LazyLogging {
 
-  implicit val system = ActorSystem("example-spray")
+  implicit val system = ActorSystem("example-akka-http")
   implicit val executor = system.dispatcher
   implicit val materializer = ActorMaterializer()
 
   val config = ConfigFactory.load()
 
-  val helloService = system.actorOf(HelloService.props("Hello"))
+  val helloService = system.actorOf(HelloService.props("Hello"), "hello-service")
 
   val exampleApplication = new ExampleApplication(helloService)
 
