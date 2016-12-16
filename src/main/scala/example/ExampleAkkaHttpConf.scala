@@ -16,27 +16,23 @@
 
 package example
 
-import io.gatling.core.Predef._
-import io.gatling.http.Predef._
+import com.typesafe.config.{Config, ConfigFactory}
 
-import scala.concurrent.duration._
+case class ExampleAkkaHttpConf(
+    interface: String,
+    port: Int
+)
 
-class ExampleSimulation extends Simulation {
+object ExampleAkkaHttpConf {
 
-  val httpConf = http.baseURL("http://localhost:8080")
-  val example = scenario("Example Simulation").exec(Browse.browse)
+  import net.ceedubs.ficus.Ficus._
 
-  setUp(
-    example.inject(rampUsers(1000) over (10.seconds))
-  ).protocols(httpConf)
+  def apply(): ExampleAkkaHttpConf = apply(ConfigFactory.load.getConfig("example-akka-http"))
 
-}
-
-object Browse {
-  val reqName = "Say hello @{n}".replaceAllLiterally("@", "$")
-  val reqUri = "/hello/@{n}".replaceAllLiterally("@", "$")
-
-  val browse = during(5.minutes, "n") {
-    exec(http(reqName).get(reqUri)).pause(3, 180)
+  def apply(config: Config): ExampleAkkaHttpConf = {
+    new ExampleAkkaHttpConf(
+      config.as[String]("interface"),
+      config.as[Int]("port")
+    )
   }
 }

@@ -5,10 +5,9 @@
     </encoder>
   </appender>
 
-  <!--
-  <logger name="akka" level="INFO"/>
-  <logger name="spray" level="INFO"/>
-  -->
+  <!--<logger name="example" level="DEBUG"/>-->
+
+  <!--<logger name="akka" level="INFO"/>-->
 
   <root level="OFF">
     <appender-ref ref="STDOUT"/>

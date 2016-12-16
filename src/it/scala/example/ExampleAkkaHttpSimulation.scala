@@ -14,7 +14,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.8.0")
-addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.5.0")
-addSbtPlugin("org.scoverage" % "sbt-coveralls" % "1.1.0")
-addSbtPlugin("io.gatling" % "gatling-sbt" % "2.2.0")
+package example
+
+import io.gatling.core.Predef._
+import io.gatling.http.Predef._
+
+import scala.concurrent.duration._
+
+class ExampleAkkaHttpSimulation extends Simulation {
+
+  val httpConf = http.baseURL("http://localhost:8080")
+  val exampleScenario = scenario("Example Simulation").exec(Browse.browse)
+
+  setUp(
+    exampleScenario.inject(
+      atOnceUsers(5),
+      nothingFor(10.seconds),
+      rampUsers(100) over (20.seconds))
+  ).protocols(httpConf)
+
+}
+
+object Browse {
+  val reqName = "Say hello @{n}".replaceAllLiterally("@", "$")
+  val reqUri = "/hello/@{n}".replaceAllLiterally("@", "$")
+
+  val browse = during(40.seconds, "n") {
+    exec(http(reqName).get(reqUri)).pause(1.second)
+  }
+}

@@ -17,7 +17,7 @@
 package example
 
 import akka.actor.Actor
-import akka.http.scaladsl.model.StatusCodes._
+import akka.http.scaladsl.model.StatusCodes.{InternalServerError, OK}
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import akka.testkit.TestActorRef
 import example.HelloService.{Hello, SayHello}
@@ -25,13 +25,7 @@ import org.scalatest.{FlatSpec, Matchers}
 
 class HelloRouteSpec extends FlatSpec with Matchers with ScalatestRouteTest with HelloRoute {
 
-  def actorRefFactory = system
-
-  val anyHelloService = TestActorRef(new Actor {
-    override def receive = {
-      case SayHello(n) => sender ! Hello("any hello message")
-    }
-  })
+  //def actorRefFactory = system
 
   "HelloRoute" should "return a greeting for GET request" in {
     val helloService = TestActorRef(new Actor {
@@ -46,7 +40,7 @@ class HelloRouteSpec extends FlatSpec with Matchers with ScalatestRouteTest with
     }
   }
 
-  it should "report internal server error if underlaying service thrown an exception" in {
+  it should "report internal server error if hello service throws an exception" in {
     val helloService = TestActorRef(new Actor {
       override def receive = {
         case SayHello(123) => throw new RuntimeException
@@ -59,7 +53,13 @@ class HelloRouteSpec extends FlatSpec with Matchers with ScalatestRouteTest with
   }
 
   it should "ignore not a number for GET request" in {
-    Get("/hello/not_a_number") ~> hello(anyHelloService) ~> check {
+    val helloService = TestActorRef(new Actor {
+      override def receive = {
+        case SayHello(_) => sender ! Hello("any hello message")
+      }
+    })
+
+    Get("/hello/not_a_number") ~> hello(helloService) ~> check {
       handled shouldBe false
     }
   }

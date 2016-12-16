@@ -16,35 +16,26 @@
 
 package example
 
-import akka.actor.{ActorRef, ActorSystem}
+import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
-import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
+import kamon.Kamon
 
 import scala.concurrent.ExecutionContext
 
-object ExampleApplication extends App with LazyLogging {
+object ExampleAkkaHttpApp extends App with LazyLogging with HelloRoute {
+  Kamon.start()
 
-  implicit val system = ActorSystem("example-akka-http")
-  implicit val executor = system.dispatcher
-  implicit val materializer = ActorMaterializer()
+  implicit val actorSystem = ActorSystem("example-akka-http")
+  implicit val executor: ExecutionContext = actorSystem.dispatcher
+  implicit val materializer: ActorMaterializer = ActorMaterializer()
 
-  val config = ConfigFactory.load()
+  val config = ExampleAkkaHttpConf()
 
-  val helloService = system.actorOf(HelloService.props("Hello"), "hello-service")
+  val helloService = actorSystem.actorOf(HelloService.props("Hello"), "hello-service")
 
-  val exampleApplication = new ExampleApplication(helloService)
-
-  logger.info("Binding ...")
-  Http().bindAndHandle(exampleApplication.routes, config.getString("http.interface"), config.getInt("http.port"))
+  Http().bindAndHandle(hello(helloService), config.interface, config.port)
 }
 
-class ExampleApplication(helloService: ActorRef)(implicit ctx: ExecutionContext)
-  extends HelloRoute {
-
-  def routes: Route = hello(helloService)
-
-}
 
