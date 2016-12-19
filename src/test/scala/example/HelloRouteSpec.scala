@@ -25,8 +25,6 @@ import org.scalatest.{FlatSpec, Matchers}
 
 class HelloRouteSpec extends FlatSpec with Matchers with ScalatestRouteTest with HelloRoute {
 
-  //def actorRefFactory = system
-
   "HelloRoute" should "return a greeting for GET request" in {
     val helloService = TestActorRef(new Actor {
       override def receive = {

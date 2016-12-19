@@ -17,17 +17,18 @@
 package example
 
 import akka.actor.ActorRef
-import akka.http.scaladsl.marshalling.ToResponseMarshallable
+import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.pattern.ask
+import com.typesafe.scalalogging.LazyLogging
 import example.HelloService.{Hello, SayHello}
 import kamon.annotation.{EnableKamon, Trace}
 
 import scala.concurrent.ExecutionContext
 
 @EnableKamon
-trait HelloRoute {
+trait HelloRoute extends LazyLogging {
 
   import Timeouts._
 
@@ -35,10 +36,9 @@ trait HelloRoute {
   def hello(helloService: ActorRef)(implicit ctx: ExecutionContext): Route =
     path("hello" / IntNumber) { number =>
       get {
-        complete {
-          (helloService ? SayHello(number)).map[ToResponseMarshallable] {
-            case Hello(msg) => msg
-          }
+        onSuccess(helloService ? SayHello(number)) {
+          case Hello(msg) => complete(msg)
+          case _ => complete(StatusCodes.InternalServerError)
         }
       }
     }

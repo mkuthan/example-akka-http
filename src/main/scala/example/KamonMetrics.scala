@@ -16,12 +16,10 @@
 
 package example
 
-object Timeouts {
+import kamon.Kamon
 
-  import akka.util.Timeout
+trait KamonMetrics {
+  Kamon.start()
 
-  import scala.concurrent.duration._
-
-  implicit val internalTimeout = Timeout(10.seconds)
-
+  def stopKamon(): Unit = Kamon.shutdown()
 }

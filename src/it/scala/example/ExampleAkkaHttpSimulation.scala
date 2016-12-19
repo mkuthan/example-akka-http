@@ -24,22 +24,31 @@ import scala.concurrent.duration._
 class ExampleAkkaHttpSimulation extends Simulation {
 
   val httpConf = http.baseURL("http://localhost:8080")
-  val exampleScenario = scenario("Example Simulation").exec(Browse.browse)
+
+  val heartbeatScenario = scenario("Heartbeat").exec(Heartbeat.heartbeat)
+  val sayHelloScenario = scenario("Hello service").exec(SayHello.sayHello)
 
   setUp(
-    exampleScenario.inject(
-      atOnceUsers(5),
-      nothingFor(10.seconds),
-      rampUsers(100) over (20.seconds))
+    heartbeatScenario.inject(atOnceUsers(1)),
+    sayHelloScenario.inject(rampUsers(100) over (10.seconds))
   ).protocols(httpConf)
 
 }
 
-object Browse {
+object Heartbeat {
+  val reqName = "Heartbeat"
+  val reqUri = "/heartbeat"
+
+  val heartbeat = during(60.seconds) {
+    exec(http(reqName).get(reqUri))
+  }
+}
+
+object SayHello {
   val reqName = "Say hello @{n}".replaceAllLiterally("@", "$")
   val reqUri = "/hello/@{n}".replaceAllLiterally("@", "$")
 
-  val browse = during(40.seconds, "n") {
-    exec(http(reqName).get(reqUri)).pause(1.second)
+  val sayHello = during(60.seconds, "n") {
+    exec(http(reqName).get(reqUri))
   }
 }

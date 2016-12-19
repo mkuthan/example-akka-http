@@ -19,6 +19,8 @@ package example
 import akka.actor.{Actor, Props}
 import com.typesafe.scalalogging.LazyLogging
 
+import scala.util.Random
+
 object HelloService {
 
   case class SayHello(n: Int)
@@ -35,7 +37,7 @@ class HelloService(msg: String) extends Actor with LazyLogging {
 
   override def receive: Receive = {
     case SayHello(n) => {
-      logger.debug(s"Handle message $n")
+      Thread.sleep(Random.nextInt(100).toLong)
       sender() ! Hello(s"$msg $n")
     }
   }

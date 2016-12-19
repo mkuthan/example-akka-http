@@ -18,24 +18,53 @@ package example
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
+import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
 import com.typesafe.scalalogging.LazyLogging
-import kamon.Kamon
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{Await, ExecutionContext}
+import scala.util.{Failure, Success}
 
-object ExampleAkkaHttpApp extends App with LazyLogging with HelloRoute {
-  Kamon.start()
+object ExampleAkkaHttpApp extends App with LazyLogging with KamonMetrics
+  with HeartbeatRoute
+  with HelloRoute {
 
-  implicit val actorSystem = ActorSystem("example-akka-http")
-  implicit val executor: ExecutionContext = actorSystem.dispatcher
-  implicit val materializer: ActorMaterializer = ActorMaterializer()
+  private val config = ExampleAkkaHttpConf()
 
-  val config = ExampleAkkaHttpConf()
+  private implicit val actorSystem = ActorSystem("example-akka-http")
+  private implicit val executor: ExecutionContext = actorSystem.dispatcher
+  private implicit val materializer: ActorMaterializer = ActorMaterializer()
 
-  val helloService = actorSystem.actorOf(HelloService.props("Hello"), "hello-service")
+  private val helloService = actorSystem.actorOf(HelloService.props("Hello"), "hello-service")
+  private val routes = heartbeat() ~ hello(helloService)
 
-  Http().bindAndHandle(hello(helloService), config.interface, config.port)
+  logger.info(s"Starting server on ${config.interface}:${config.port}")
+  Http().bindAndHandle(routes, config.interface, config.port)
+    .onComplete {
+      case Success(binding) =>
+        val address = binding.localAddress
+        logger.info(s"Server is listening on ${address.getHostString}:${address.getPort}")
+        registerShutdownHook(binding)
+      case Failure(ex) =>
+        logger.error(s"Server could not be started", ex)
+        stopAll()
+    }
+
+  private def registerShutdownHook(binding: Http.ServerBinding): Unit = {
+    scala.sys.addShutdownHook {
+      binding.unbind().onComplete { _ =>
+        stopAll()
+      }
+    }
+  }
+
+  private def stopAll(): Unit = {
+    actorSystem.terminate()
+    Await.result(actorSystem.whenTerminated, config.shutdownTimeout)
+
+    stopKamon()
+  }
+
 }
 
 

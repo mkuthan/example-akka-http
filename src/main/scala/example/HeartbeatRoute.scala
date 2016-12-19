@@ -16,12 +16,22 @@
 
 package example
 
-object Timeouts {
+import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Route
+import com.typesafe.scalalogging.LazyLogging
+import kamon.annotation.{EnableKamon, Trace}
 
-  import akka.util.Timeout
+import scala.concurrent.ExecutionContext
 
-  import scala.concurrent.duration._
+@EnableKamon
+trait HeartbeatRoute extends LazyLogging {
 
-  implicit val internalTimeout = Timeout(10.seconds)
-
+  @Trace("heartbeat")
+  def heartbeat()(implicit ctx: ExecutionContext): Route =
+    path("heartbeat") {
+      get {
+        complete(StatusCodes.OK)
+      }
+    }
 }

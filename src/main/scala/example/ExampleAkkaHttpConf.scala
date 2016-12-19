@@ -18,9 +18,12 @@ package example
 
 import com.typesafe.config.{Config, ConfigFactory}
 
+import scala.concurrent.duration.FiniteDuration
+
 case class ExampleAkkaHttpConf(
     interface: String,
-    port: Int
+    port: Int,
+    shutdownTimeout: FiniteDuration
 )
 
 object ExampleAkkaHttpConf {
@@ -32,7 +35,8 @@ object ExampleAkkaHttpConf {
   def apply(config: Config): ExampleAkkaHttpConf = {
     new ExampleAkkaHttpConf(
       config.as[String]("interface"),
-      config.as[Int]("port")
+      config.as[Int]("port"),
+      config.as[FiniteDuration]("shutdown-timeout")
     )
   }
 }
