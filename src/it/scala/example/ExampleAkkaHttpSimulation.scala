@@ -29,7 +29,7 @@ class ExampleAkkaHttpSimulation extends Simulation {
   val sayHelloScenario = scenario("Hello service").exec(SayHello.sayHello)
 
   setUp(
-    heartbeatScenario.inject(atOnceUsers(1)),
+    heartbeatScenario.inject(atOnceUsers(5)),
     sayHelloScenario.inject(rampUsers(100) over (10.seconds))
   ).protocols(httpConf)
 

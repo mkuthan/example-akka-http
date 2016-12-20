@@ -16,12 +16,27 @@
 
 package example
 
-object Timeouts {
+import akka.actor.{Actor, Props}
+import com.typesafe.scalalogging.LazyLogging
 
-  import akka.util.Timeout
+object HeartbeatService {
 
-  import scala.concurrent.duration._
+  case object Heartbeat
 
-  implicit val internalTimeout = Timeout(10.seconds)
+  case object Healthy
 
+  case object Unhealty
+
+  def props(): Props = Props(new HeartbeatService())
+}
+
+class HeartbeatService extends Actor with LazyLogging {
+
+  import HeartbeatService._
+
+  override def receive: Receive = {
+    case Heartbeat => {
+      sender() ! Healthy
+    }
+  }
 }

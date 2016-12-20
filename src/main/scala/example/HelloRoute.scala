@@ -21,6 +21,7 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.pattern.ask
+import akka.util.Timeout
 import com.typesafe.scalalogging.LazyLogging
 import example.HelloService.{Hello, SayHello}
 import kamon.annotation.{EnableKamon, Trace}
@@ -30,7 +31,9 @@ import scala.concurrent.ExecutionContext
 @EnableKamon
 trait HelloRoute extends LazyLogging {
 
-  import Timeouts._
+  import scala.concurrent.duration._
+
+  private implicit val internalTimeout = Timeout(10.seconds)
 
   @Trace("hello")
   def hello(helloService: ActorRef)(implicit ctx: ExecutionContext): Route =

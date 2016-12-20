@@ -19,6 +19,7 @@ package example
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives._
+import akka.routing.SmallestMailboxPool
 import akka.stream.ActorMaterializer
 import com.typesafe.scalalogging.LazyLogging
 
@@ -35,8 +36,19 @@ object ExampleAkkaHttpApp extends App with LazyLogging with KamonMetrics
   private implicit val executor: ExecutionContext = actorSystem.dispatcher
   private implicit val materializer: ActorMaterializer = ActorMaterializer()
 
-  private val helloService = actorSystem.actorOf(HelloService.props("Hello"), "hello-service")
-  private val routes = heartbeat() ~ hello(helloService)
+  private val heartbeatService = actorSystem.actorOf(
+    HeartbeatService.props()
+      .withMailbox("akka.actor.bounded-mailbox"),
+    "heartbeat-service")
+
+  private val helloService = actorSystem.actorOf(
+    HelloService.props("Hello")
+      .withMailbox("akka.actor.bounded-mailbox")
+      .withDispatcher("akka.actor.blocking-dispatcher")
+      .withRouter(SmallestMailboxPool(config.helloServiceInstances)),
+    "hello-service")
+
+  private val routes = heartbeat(heartbeatService) ~ hello(helloService)
 
   logger.info(s"Starting server on ${config.interface}:${config.port}")
   Http().bindAndHandle(routes, config.interface, config.port)

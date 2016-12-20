@@ -37,7 +37,7 @@ class HelloService(msg: String) extends Actor with LazyLogging {
 
   override def receive: Receive = {
     case SayHello(n) => {
-      Thread.sleep(Random.nextInt(100).toLong)
+      Thread.sleep(Random.nextInt(50).toLong)
       sender() ! Hello(s"$msg $n")
     }
   }

@@ -16,10 +16,14 @@
 
 package example
 
+import akka.actor.ActorRef
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
+import akka.pattern.ask
+import akka.util.Timeout
 import com.typesafe.scalalogging.LazyLogging
+import example.HeartbeatService.{Healthy, Heartbeat, Unhealty}
 import kamon.annotation.{EnableKamon, Trace}
 
 import scala.concurrent.ExecutionContext
@@ -27,11 +31,19 @@ import scala.concurrent.ExecutionContext
 @EnableKamon
 trait HeartbeatRoute extends LazyLogging {
 
+  import scala.concurrent.duration._
+
+  private implicit val internalTimeout = Timeout(100.milliseconds)
+
   @Trace("heartbeat")
-  def heartbeat()(implicit ctx: ExecutionContext): Route =
+  def heartbeat(heartbeatService: ActorRef)(implicit ctx: ExecutionContext): Route =
     path("heartbeat") {
       get {
-        complete(StatusCodes.OK)
+        onSuccess(heartbeatService ? Heartbeat) {
+          case Healthy => complete(StatusCodes.OK)
+          case Unhealty => complete(StatusCodes.InternalServerError)
+        }
+
       }
     }
 }

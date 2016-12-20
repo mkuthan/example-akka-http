@@ -16,7 +16,7 @@
 
 val akkaVersion = "2.4.14"
 val akkaHttpVersion = "10.0.0"
-val kamonVersion = "0.6.2"
+val kamonVersion = "0.6.3"
 val gatlingVersion = "2.2.3"
 
 val commonSettings = Seq(

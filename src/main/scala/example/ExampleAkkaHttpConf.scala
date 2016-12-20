@@ -21,9 +21,10 @@ import com.typesafe.config.{Config, ConfigFactory}
 import scala.concurrent.duration.FiniteDuration
 
 case class ExampleAkkaHttpConf(
-    interface: String,
-    port: Int,
-    shutdownTimeout: FiniteDuration
+  interface: String,
+  port: Int,
+  shutdownTimeout: FiniteDuration,
+  helloServiceInstances: Int
 )
 
 object ExampleAkkaHttpConf {
@@ -36,7 +37,8 @@ object ExampleAkkaHttpConf {
     new ExampleAkkaHttpConf(
       config.as[String]("interface"),
       config.as[Int]("port"),
-      config.as[FiniteDuration]("shutdown-timeout")
+      config.as[FiniteDuration]("shutdown-timeout"),
+      config.as[Int]("hello-service-instances")
     )
   }
 }
